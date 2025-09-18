@@ -1,0 +1,726 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Seating Arrangement - Student Portal</title>
+    <link rel="stylesheet" href="../../admin.css">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <script src="../../utils.js"></script>
+    <style>
+        body {
+            font-family: var(--font-body);
+            background-color: #f5f7fb;
+            color: var(--gray-800);
+            line-height: 1.6;
+        }
+
+        .user-container {
+            display: flex;
+            min-height: 100vh;
+        }
+
+        /* Sidebar Styles */
+        .sidebar {
+            width: 250px;
+            background: linear-gradient(180deg, var(--primary), var(--secondary));
+            color: white;
+            padding: 20px 0;
+            box-shadow: 2px 0 5px rgba(0, 0, 0, 0.1);
+            z-index: 100;
+            transition: all 0.3s ease;
+        }
+
+        .sidebar-header {
+            padding: 0 20px 20px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            margin-bottom: 20px;
+        }
+
+        .sidebar-header h2 {
+            font-size: 1.5rem;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .sidebar-menu {
+            list-style: none;
+        }
+
+        .sidebar-menu li {
+            margin-bottom: 5px;
+        }
+
+        .sidebar-menu a {
+            display: flex;
+            align-items: center;
+            padding: 12px 20px;
+            color: rgba(255, 255, 255, 0.8);
+            text-decoration: none;
+            transition: var(--transition);
+            gap: 12px;
+            font-size: 1rem;
+        }
+
+        .sidebar-menu a:hover, .sidebar-menu a.active {
+            background: rgba(255, 255, 255, 0.1);
+            color: white;
+        }
+
+        .sidebar-menu a i {
+            width: 20px;
+            text-align: center;
+        }
+
+        /* Main Content Styles */
+        .main-content {
+            flex: 1;
+            padding: 20px;
+            overflow-y: auto;
+        }
+
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 30px;
+            padding-bottom: 15px;
+            border-bottom: 1px solid var(--gray-300);
+            background: var(--white);
+            border-radius: var(--radius-lg);
+            padding: var(--space-4);
+            box-shadow: var(--shadow-sm);
+        }
+
+        .header h1 {
+            font-size: 1.8rem;
+            color: var(--gray-900);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .user-info {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .content-wrapper {
+            padding: 20px 0;
+        }
+
+        .page-header {
+            margin-bottom: var(--space-6);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: var(--space-3);
+        }
+
+        .page-header-content {
+            flex: 1;
+        }
+
+        .page-header h2 {
+            font-size: 1.75rem;
+            margin-bottom: var(--space-2);
+            color: var(--primary-800);
+        }
+
+        .page-header p {
+            color: var(--gray-600);
+        }
+
+        .refresh-controls {
+            display: flex;
+            gap: var(--space-2);
+            align-items: center;
+        }
+
+        .last-updated {
+            font-size: 0.85rem;
+            color: var(--gray-500);
+            margin-right: var(--space-2);
+        }
+
+        /* Room Assignments Section */
+        .room-assignments-section {
+            margin-top: var(--space-6);
+            background: var(--white);
+            border-radius: var(--radius-lg);
+            padding: var(--space-5);
+            box-shadow: var(--shadow-md);
+            border: 1px solid var(--gray-200);
+        }
+
+        .room-assignments-section-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: var(--space-4);
+        }
+
+        .room-assignments-section-header h2 {
+            font-size: 1.5rem;
+            color: var(--primary-800);
+            display: flex;
+            align-items: center;
+            gap: var(--space-2);
+        }
+
+        .assignments-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: var(--space-3);
+            background: var(--white);
+            border-radius: var(--radius-md);
+            overflow: hidden;
+            box-shadow: var(--shadow-sm);
+        }
+
+        .assignments-table th,
+        .assignments-table td {
+            padding: var(--space-3);
+            text-align: left;
+            border-bottom: 1px solid var(--gray-200);
+        }
+
+        .assignments-table th {
+            background: var(--primary-50);
+            color: var(--gray-700);
+            font-weight: 600;
+            border-bottom: 2px solid var(--primary-200);
+        }
+
+        .assignments-table tr:last-child td {
+            border-bottom: none;
+        }
+
+        .assignments-table tr:hover {
+            background: var(--primary-50);
+        }
+
+        .roll-numbers {
+            display: flex;
+            flex-wrap: wrap;
+            gap: var(--space-1);
+        }
+
+        .roll-number {
+            background: var(--primary-100);
+            color: var(--primary-800);
+            padding: var(--space-1) var(--space-2);
+            border-radius: var(--radius-sm);
+            font-size: 0.8rem;
+            font-weight: 500;
+        }
+
+        /* Connection status indicator */
+        .connection-status {
+            display: flex;
+            align-items: center;
+            gap: var(--space-1);
+            padding: var(--space-1) var(--space-2);
+            border-radius: var(--radius-sm);
+            font-size: 0.85rem;
+            margin-left: var(--space-2);
+        }
+
+        .connection-status.connected {
+            background-color: var(--success-100);
+            color: var(--success-800);
+        }
+
+        .connection-status.disconnected {
+            background-color: var(--error-100);
+            color: var(--error-800);
+        }
+
+        @media (max-width: 768px) {
+            .user-container {
+                flex-direction: column;
+            }
+
+            .sidebar {
+                width: 100%;
+                padding: 10px 0;
+            }
+
+            .sidebar-menu {
+                display: flex;
+                flex-wrap: wrap;
+                justify-content: center;
+            }
+
+            .sidebar-menu li {
+                margin: 5px;
+            }
+
+            .sidebar-menu a {
+                padding: 8px 12px;
+                border-radius: var(--radius-lg);
+            }
+
+            .content-wrapper {
+                padding: var(--space-4);
+            }
+
+            .page-header {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+
+            .refresh-controls {
+                width: 100%;
+                justify-content: flex-end;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="user-container">
+        <!-- Sidebar -->
+        <nav class="sidebar">
+            <div class="sidebar-header">
+                <h2><i class="fas fa-graduation-cap"></i> Student Portal</h2>
+            </div>
+            <ul class="sidebar-menu">
+                <li><a href="../dashboard/dashboard.html"><i class="fas fa-home"></i> Dashboard</a></li>
+                <li><a href="../exams/exams.html"><i class="fas fa-calendar-alt"></i> Exam Timetable</a></li>
+                <li><a href="seating.html" class="active"><i class="fas fa-chair"></i> Seating Arrangement</a></li>
+                <li><a href="../notifications/notifications.html"><i class="fas fa-bell"></i> Notifications</a></li>
+                <li><a href="../profile/profile.html"><i class="fas fa-user-circle"></i> Profile</a></li>
+                <li><a href="../../user.html"><i class="fas fa-sign-out-alt"></i> Logout</a></li>
+            </ul>
+        </nav>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            <div class="header">
+                <h1><i class="fas fa-chair"></i> Seating Arrangement</h1>
+                <div class="user-info">
+                    <span id="currentDateTime"></span>
+                    <span>Student</span>
+                    <i class="fas fa-user-circle"></i>
+                    <div class="connection-status connected" id="connectionStatus">
+                        <i class="fas fa-circle"></i>
+                        <span>Connected</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="content-wrapper">
+                <div class="page-header">
+                    <div class="page-header-content">
+                        <h2>Your Seating Assignments</h2>
+                        <p>View your assigned seats for each exam</p>
+                    </div>
+                    <div class="refresh-controls">
+                        <span class="last-updated" id="lastUpdated">Last updated: Just now</span>
+                        <button class="btn btn-secondary" id="refreshButton" onclick="refreshAllData()">
+                            <i class="fas fa-sync-alt"></i> Refresh
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Room Roll Number Assignments Section -->
+                <div class="room-assignments-section">
+                    <div class="room-assignments-section-header">
+                        <h2><i class="fas fa-user-graduate"></i> Room Roll Number Assignments</h2>
+                        <div style="display: flex; gap: var(--space-2);">
+                            <div class="connection-status connected" id="assignmentsConnectionStatus">
+                                <i class="fas fa-circle"></i>
+                                <span>Live</span>
+                            </div>
+                            <button class="btn btn-secondary btn-sm" onclick="fetchRoomAssignments()">
+                                <i class="fas fa-sync-alt"></i> Refresh
+                            </button>
+                        </div>
+                    </div>
+                    <div class="table-container">
+                        <table class="assignments-table">
+                            <thead>
+                                <tr>
+                                    <th><i class="fas fa-door-open"></i> Room</th>
+                                    <th><i class="fas fa-building"></i> Building</th>
+                                    <th><i class="fas fa-users"></i> Capacity</th>
+                                    <th><i class="fas fa-id-card"></i> Assigned Roll Numbers</th>
+                                    <th><i class="fas fa-hashtag"></i> Count</th>
+                                </tr>
+                            </thead>
+                            <tbody id="roomAssignmentsTableBody">
+                                <tr>
+                                    <td colspan="5" style="text-align: center; padding: 2rem;">
+                                        <i class="fas fa-spinner fa-spin" style="font-size: 2rem; color: var(--primary-600); margin-bottom: 1rem;"></i>
+                                        <p>Loading room assignments...</p>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <script>
+        // Update current date/time
+        function updateCurrentDateTime() {
+            const now = new Date();
+            const options = {
+                weekday: 'long',
+                year: 'numeric',
+                month: 'long',
+                day: 'numeric',
+                hour: '2-digit',
+                minute: '2-digit',
+                timeZone: 'Asia/Kolkata'
+            };
+            document.getElementById('currentDateTime').textContent = now.toLocaleString("en-US", options);
+        }
+
+        // Update last updated timestamp
+        function updateLastUpdated() {
+            const now = new Date();
+            const options = {
+                hour: '2-digit',
+                minute: '2-digit',
+                second: '2-digit',
+                timeZone: 'Asia/Kolkata'
+            };
+            document.getElementById('lastUpdated').textContent = 'Last updated: ' + now.toLocaleTimeString("en-US", options);
+        }
+
+        // Update connection status
+        function updateConnectionStatus(connected) {
+            const statusElement = document.getElementById('connectionStatus');
+            const assignmentsStatusElement = document.getElementById('assignmentsConnectionStatus');
+            
+            if (connected) {
+                statusElement.className = 'connection-status connected';
+                statusElement.innerHTML = '<i class="fas fa-circle"></i> <span>Connected</span>';
+                
+                assignmentsStatusElement.className = 'connection-status connected';
+                assignmentsStatusElement.innerHTML = '<i class="fas fa-circle"></i> <span>Live</span>';
+            } else {
+                statusElement.className = 'connection-status disconnected';
+                statusElement.innerHTML = '<i class="fas fa-circle"></i> <span>Disconnected</span>';
+                
+                assignmentsStatusElement.className = 'connection-status disconnected';
+                assignmentsStatusElement.innerHTML = '<i class="fas fa-circle"></i> <span>Offline</span>';
+            }
+        }
+
+        // Store last modified timestamps to detect changes
+        let lastModifiedTimestamps = {
+            seatingPlans: null,
+            rooms: null,
+            students: null
+        };
+
+        // Check for data changes and refresh if needed
+        async function checkForChangesAndRefresh() {
+            try {
+                // Fetch last modified timestamps
+                const timestamps = await fetchData('lastModified');
+                
+                // Check if any relevant data has changed
+                const hasChanges = 
+                    lastModifiedTimestamps.seatingPlans !== timestamps.seatingPlans ||
+                    lastModifiedTimestamps.rooms !== timestamps.rooms ||
+                    lastModifiedTimestamps.students !== timestamps.students;
+                
+                // Update stored timestamps
+                lastModifiedTimestamps = {
+                    seatingPlans: timestamps.seatingPlans,
+                    rooms: timestamps.rooms,
+                    students: timestamps.students
+                };
+                
+                // If there are changes, refresh the data
+                if (hasChanges) {
+                    console.log('Detected changes in data, refreshing...');
+                    await refreshAllData();
+                    updateLastUpdated();
+                }
+            } catch (error) {
+                console.error('Error checking for changes:', error);
+                // Still try to refresh data even if we can't check timestamps
+                await refreshAllData();
+            }
+        }
+
+        // Fetch room assignments data from API
+        async function fetchRoomAssignments() {
+            try {
+                // Fetch rooms, seating plans, and students data
+                const [rooms, seatingPlans, students] = await Promise.all([
+                    fetchData('rooms'),
+                    fetchData('seatingPlans'),
+                    fetchData('students')
+                ]);
+
+                // Create a map of student ID to student data for quick lookup
+                const studentMap = {};
+                students.forEach(student => {
+                    studentMap[student._id] = student;
+                });
+
+                // Create a map of room ID to room details
+                const roomMap = {};
+                rooms.forEach(room => {
+                    roomMap[room._id] = {
+                        ...room,
+                        students: []
+                    };
+                });
+
+                // Process seating plans to extract roll numbers for each room
+                seatingPlans.forEach((plan) => {
+                    // Extract room information from planData
+                    let roomId = null;
+                    let seats = [];
+                    
+                    // Check different possible structures for the seating plan
+                    if (plan.planData && plan.planData.roomId) {
+                        // Original structure
+                        roomId = plan.planData.roomId;
+                        seats = plan.planData.seats || [];
+                    } else if (plan.roomId) {
+                        // Alternative structure
+                        roomId = plan.roomId;
+                        seats = plan.seats || [];
+                    } else {
+                        // Try to find roomId in the plan object directly
+                        roomId = plan.roomId || plan.room_id || null;
+                        seats = plan.seats || plan.planData?.seats || [];
+                    }
+                    
+                    // Additional check for nested planData structure that might occur after shuffling
+                    if (!roomId && plan.planData && plan.planData.planData && plan.planData.planData.roomId) {
+                        roomId = plan.planData.planData.roomId;
+                        seats = plan.planData.planData.seats || [];
+                    }
+                    
+                    // Additional check for direct planData structure (after our fix)
+                    if (!roomId && plan.planData && typeof plan.planData === 'object' && plan.planData.roomId) {
+                        roomId = plan.planData.roomId;
+                        seats = plan.planData.seats || [];
+                    }
+                    
+                    if (roomId && roomMap[roomId]) {
+                        // Extract roll numbers from seats
+                        if (Array.isArray(seats)) {
+                            seats.forEach((seat) => {
+                                // Check if the seat has a student assigned and is not a teacher desk
+                                if (seat.studentId && !seat.isTeacherDesk) {
+                                    // First try to get roll number directly from seat data
+                                    if (seat.rollNo) {
+                                        // Add student to the room's list
+                                        roomMap[roomId].students.push({
+                                            rollNo: seat.rollNo,
+                                            name: seat.name || seat.rollNo
+                                        });
+                                    } else if (seat.studentId) {
+                                        // Fallback to looking up the student to get their roll number
+                                        const student = studentMap[seat.studentId];
+                                        if (student && student.rollNo) {
+                                            // Add student to the room's list
+                                            roomMap[roomId].students.push({
+                                                rollNo: student.rollNo,
+                                                name: student.name || student.rollNo
+                                            });
+                                        }
+                                    }
+                                } else if (seat.rollNo && !seat.isTeacherDesk) {
+                                    // Handle case where seat has rollNo but no studentId
+                                    roomMap[roomId].students.push({
+                                        rollNo: seat.rollNo,
+                                        name: seat.name || seat.rollNo
+                                    });
+                                }
+                            });
+                        }
+                    }
+                });
+
+                // Convert map to array and sort by room number
+                const assignments = Object.values(roomMap).sort((a, b) => {
+                    // Sort by building first, then by room number
+                    if (a.building !== b.building) {
+                        return a.building.localeCompare(b.building);
+                    }
+                    return a.number.localeCompare(b.number);
+                });
+
+                // Sort students in each assignment to ensure they are in ascending order
+                assignments.forEach(assignment => {
+                    if (assignment.students && assignment.students.length > 0) {
+                        assignment.students.sort((a, b) => {
+                            // Improved sorting for roll numbers like "AIDSU24001"
+                            // Extract the numeric part and sort by it
+                            const numA = parseInt(a.rollNo.match(/\d+/g)?.join('') || '0');
+                            const numB = parseInt(b.rollNo.match(/\d+/g)?.join('') || '0');
+                            return numA - numB;
+                        });
+                    }
+                });
+
+                renderRoomAssignments(assignments);
+                updateConnectionStatus(true);
+                return assignments;
+            } catch (error) {
+                console.error('Error fetching room assignments:', error);
+                updateConnectionStatus(false);
+                document.getElementById('roomAssignmentsTableBody').innerHTML = `
+                    <tr>
+                        <td colspan="5" style="text-align: center; padding: 2rem; color: var(--error-600);">
+                            <i class="fas fa-exclamation-triangle" style="font-size: 2rem; margin-bottom: 1rem;"></i>
+                            <p>Error loading room assignments. Please check your connection and try again.</p>
+                            <button onclick="fetchRoomAssignments()" style="margin-top: 1rem; background: var(--primary-500); color: white; border: none; padding: 0.5rem 1rem; border-radius: var(--radius-lg); cursor: pointer;">
+                                <i class="fas fa-sync-alt"></i> Retry
+                            </button>
+                        </td>
+                    </tr>
+                `;
+                throw error;
+            }
+        }
+
+        // Refresh all data
+        async function refreshAllData() {
+            const refreshButton = document.getElementById('refreshButton');
+            let originalText = '<i class="fas fa-sync-alt"></i> Refresh';
+            
+            // If button exists, save original text and show loading state
+            if (refreshButton) {
+                originalText = refreshButton.innerHTML;
+                refreshButton.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Refreshing...';
+                refreshButton.disabled = true;
+            }
+            
+            try {
+                // Update connection status to show we're refreshing
+                updateConnectionStatus(true);
+                
+                // Fetch room assignments
+                const roomAssignmentsResponse = await fetchRoomAssignments();
+                
+                updateLastUpdated();
+                
+                // Show success message only if triggered by user action (button click)
+                if (refreshButton) {
+                    showToast('Data refreshed successfully', 'success');
+                }
+                
+                return roomAssignmentsResponse;
+            } catch (error) {
+                console.error('Error refreshing data:', error);
+                updateConnectionStatus(false);
+                
+                // Show error message only if triggered by user action (button click)
+                if (refreshButton) {
+                    showToast('Failed to refresh data. Please try again.', 'error');
+                }
+                
+                throw error;
+            } finally {
+                // Ensure button is re-enabled even if there's an error
+                if (refreshButton) {
+                    setTimeout(() => {
+                        refreshButton.innerHTML = originalText;
+                        refreshButton.disabled = false;
+                    }, 500);
+                }
+            }
+        }
+
+        // Render room assignments
+        function renderRoomAssignments(assignments) {
+            const tableBody = document.getElementById('roomAssignmentsTableBody');
+            
+            if (!assignments || assignments.length === 0) {
+                tableBody.innerHTML = `
+                    <tr>
+                        <td colspan="5" style="text-align: center; padding: 2rem;">
+                            <i class="fas fa-info-circle" style="font-size: 2rem; color: var(--gray-400); margin-bottom: 1rem;"></i>
+                            <p>No room assignments available at this time.</p>
+                        </td>
+                    </tr>
+                `;
+                return;
+            }
+            
+            let html = '';
+            assignments.forEach(room => {
+                const rollCount = room.students ? room.students.length : 0;
+                
+                html += `
+                    <tr>
+                        <td>${room.number || 'N/A'}</td>
+                        <td>${room.building || 'N/A'}</td>
+                        <td>${room.capacity || 'N/A'}</td>
+                        <td>
+                            <div class="roll-numbers">
+                                ${room.students && room.students.length > 0 
+                                    ? room.students.map(student => 
+                                        `<span class="roll-number">${student.rollNo}</span>`
+                                      ).join('')
+                                    : '<span class="roll-number">None assigned</span>'}
+                            </div>
+                        </td>
+                        <td>${rollCount}</td>
+                    </tr>
+                `;
+            });
+            
+            tableBody.innerHTML = html;
+        }
+
+        // Initialize
+        document.addEventListener('DOMContentLoaded', async function() {
+            updateCurrentDateTime();
+            setInterval(updateCurrentDateTime, 60000); // Update every minute
+            
+            try {
+                // Fetch room assignments
+                await fetchRoomAssignments();
+                
+                // Update last updated timestamp
+                updateLastUpdated();
+                
+                // Initialize last modified timestamps
+                try {
+                    const timestamps = await fetchData('lastModified');
+                    lastModifiedTimestamps = {
+                        seatingPlans: timestamps.seatingPlans,
+                        rooms: timestamps.rooms,
+                        students: timestamps.students
+                    };
+                } catch (error) {
+                    console.error('Error initializing timestamps:', error);
+                }
+            } catch (error) {
+                console.error('Error during initialization:', error);
+                updateConnectionStatus(false);
+            }
+            
+            // Check for changes every 10 seconds (more frequent than full refresh)
+            setInterval(checkForChangesAndRefresh, 10000);
+            
+            // Also keep the existing 30-second refresh as a fallback
+            setInterval(refreshAllData, 30000);
+            
+            // Add event listener for visibility change to refresh when tab becomes active
+            document.addEventListener('visibilitychange', function() {
+                if (!document.hidden) {
+                    checkForChangesAndRefresh();
+                }
+            });
+        });
+    </script>
+</body>
+</html>
